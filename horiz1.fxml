@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+    <HBox fx:id="horiz1" prefHeight="191.0" prefWidth="712.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+        <children>
+            <AnchorPane prefHeight="158.0" prefWidth="132.0">
+                <children>
+                    <VBox fx:id="ContextPackBlock" prefHeight="200.0" prefWidth="132.0">
+                        <children>
+                            <Button mnemonicParsing="false" onAction="#addNewContextPack" prefHeight="25.0" prefWidth="118.0" text="New Context Pack" />
+                            <TextField prefHeight="25.0" prefWidth="95.0" promptText="Subpack name">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                </VBox.margin>
+                            </TextField>
+                            <RadioButton mnemonicParsing="false" selected="true" text="Enabled">
+                                <VBox.margin>
+                                    <Insets bottom="2.0" />
+                                </VBox.margin>
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="wordPackRadio" />
+                                </toggleGroup>
+                            </RadioButton>
+                            <RadioButton mnemonicParsing="false" text="Disabled" toggleGroup="$wordPackRadio">
+                                <VBox.margin>
+                                    <Insets top="2.0" />
+                                </VBox.margin>
+                            </RadioButton>
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </padding>
+                    </VBox>
+                </children>
+            </AnchorPane>
+            <VBox prefHeight="150.0" prefWidth="582.0">
+                <children>
+                    <HBox fx:id="horiz2" prefHeight="117.0" prefWidth="582.0">
+                        <children>
+                            <AnchorPane prefHeight="204.0" prefWidth="105.0">
+                                <children>
+                                    <VBox fx:id="WordPackBlock" prefHeight="204.0" prefWidth="125.0">
+                                        <padding>
+                                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                        </padding>
+                                        <children>
+                                            <Button fx:id="newWordPack" mnemonicParsing="false" onAction="#addNewWordPack" prefHeight="25.0" prefWidth="111.0" text="New wordpack" />
+                                            <TextField promptText="Ex: nouns">
+                                                <VBox.margin>
+                                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                </VBox.margin>
+                                            </TextField>
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </AnchorPane>
+                            <AnchorPane prefHeight="201.0" prefWidth="270.0">
+                                <children>
+                                    <VBox fx:id="WordFormBlock" prefHeight="200.0" prefWidth="457.0">
+                                        <children>
+                                            <Button fx:id="addWord" mnemonicParsing="false" onAction="#addNewWord" text="Add word" />
+                                            <TextField fx:id="wordBox" prefHeight="25.0" prefWidth="311.0" promptText="Baseword, form1, form2, form3, etc.">
+                                                <VBox.margin>
+                                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                </VBox.margin>
+                                            </TextField>
+                                        </children>
+                                        <padding>
+                                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                        </padding>
+                                    </VBox>
+                                </children>
+                            </AnchorPane>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+        </children>
+    </HBox>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="topParent" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <AnchorPane layoutX="18.0" layoutY="14.0" prefHeight="76.0" prefWidth="735.0">
+         <children>
+            <TextField fx:id="mainPackNameField" layoutX="21.0" layoutY="16.0" promptText="context pack name" />
+            <RadioButton layoutX="357.0" layoutY="18.0" mnemonicParsing="false" selected="true" text="Enabled">
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding>
+               <toggleGroup>
+                  <ToggleGroup fx:id="contextPackRadio" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton layoutX="436.0" layoutY="18.0" mnemonicParsing="false" text="Disabled" toggleGroup="$contextPackRadio">
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding>
+            </RadioButton>
+            <Button fx:id="exportPackButton" layoutX="625.0" layoutY="17.0" mnemonicParsing="false" onAction="#createContextPack" text="Export Pack" />
+            <Button layoutX="200.0" layoutY="16.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="115.0" text="Set Icon directory" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </AnchorPane>
+      <ScrollPane fx:id="scrollPane" layoutX="26.0" layoutY="71.0" prefHeight="452.0" prefWidth="719.0">
+         <content>
+            <VBox fx:id="scrollVBox" prefHeight="112.0" prefWidth="719.0">
+               <children>
+                  <AnchorPane fx:id="anchor1" prefHeight="140.0" prefWidth="719.0">
+                     <children>
+                        <HBox fx:id="horiz1" prefHeight="191.0" prefWidth="712.0">
+                           <children>
+                              <AnchorPane fx:id="anchor2" prefHeight="158.0" prefWidth="132.0">
+                                 <children>
+                                    <VBox fx:id="ContextPackBlock" prefHeight="200.0" prefWidth="132.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#addNewContextPack" prefHeight="25.0" prefWidth="118.0" text="New Context Pack" />
+                                          <TextField fx:id="contextPackNameField" prefHeight="25.0" prefWidth="95.0" promptText="Subpack name">
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" top="5.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <RadioButton mnemonicParsing="false" selected="true" text="Enabled">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" />
+                                             </VBox.margin>
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="wordPackRadio" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton mnemonicParsing="false" text="Disabled" toggleGroup="$wordPackRadio">
+                                             <VBox.margin>
+                                                <Insets top="2.0" />
+                                             </VBox.margin>
+                                          </RadioButton>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                              <VBox fx:id="vert1" prefHeight="150.0" prefWidth="582.0">
+                                 <children>
+                                    <HBox fx:id="horiz2" prefHeight="117.0" prefWidth="582.0">
+                                       <children>
+                                          <AnchorPane fx:id="wordPackAnchor" prefHeight="204.0" prefWidth="105.0">
+                                             <children>
+                                                <VBox fx:id="WordPackBlock" prefHeight="204.0" prefWidth="125.0">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <children>
+                                                      <Button fx:id="newWordPack" mnemonicParsing="false" onAction="#addNewWordPack" prefHeight="25.0" prefWidth="111.0" text="New wordpack" />
+                                                      <TextField fx:id="wordPackNameField" promptText="Ex: nouns">
+                                                         <VBox.margin>
+                                                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane fx:id="wordFormAnchor" prefHeight="201.0" prefWidth="270.0">
+                                             <children>
+                                                <VBox fx:id="WordFormBlock" prefHeight="200.0" prefWidth="457.0">
+                                                   <children>
+                                                      <Button fx:id="addWord"  mnemonicParsing="false" onAction="#addNewWord"  text="Add word" />
+                                                      <TextField id="wordBox" fx:id="wordBox" prefHeight="25.0" prefWidth="311.0" onAction="#createContextPack" promptText="Baseword, form1, form2, form3, etc.">
+                                                         <VBox.margin>
+                                                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</AnchorPane>
