@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+    <HBox fx:id="wordTypeBox" prefHeight="117.0" prefWidth="582.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+        <children>
+            <VBox fx:id="wordTypeInfo" prefHeight="112.0" prefWidth="273.0">
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </padding>
+                <children>
+                    <TextField fx:id="chooseWordType" promptText="enter type (noun, verb, etc)">
+                        <VBox.margin>
+                            <Insets top="5.0" />
+                        </VBox.margin>
+                    </TextField>
+                </children>
+            </VBox>
+            <VBox fx:id="wordFormRoot" prefHeight="200.0" prefWidth="457.0">
+                <children>
+                    <Button fx:id="addWord" mnemonicParsing="false" onAction="#addNewWord" text="Add word/forms" />
+                    <TextField fx:id="wordForms" prefHeight="25.0" prefWidth="311.0" promptText="Baseword, form1, form2, form3, etc.">
+                        <VBox.margin>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </VBox.margin>
+                    </TextField>
+                </children>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </padding>
+            </VBox>
+        </children>
+    </HBox>
