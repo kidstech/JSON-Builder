@@ -11,7 +11,7 @@
         <children>
             <VBox fx:id="wordPackInfo" prefHeight="204.0" prefWidth="262.0">
                 <children>
-                    <TextField fx:id="wordPackNameField" prefHeight="25.0" prefWidth="95.0" promptText="Subpack name" text="Wordpack Name">
+                    <TextField fx:id="wordPackNameField" prefHeight="25.0" prefWidth="95.0" promptText="Wordpack name">
                         <VBox.margin>
                             <Insets bottom="5.0" top="5.0" />
                         </VBox.margin>
