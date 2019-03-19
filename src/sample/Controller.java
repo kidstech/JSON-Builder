@@ -2,10 +2,8 @@
 
 package sample;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,19 +11,20 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import jdk.nashorn.internal.parser.JSONParser;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 
 public class Controller {
 
     @FXML
     AnchorPane topParent;
+    Stage primaryStage;
 
     String contextPackName;
     String iconPath = "not set";
@@ -36,13 +35,15 @@ public class Controller {
     }
 
 
+    // For choosing the icon directory (not the actual file).
     public void chooseDir(ActionEvent event) {
         DirectoryChooser chooser = new DirectoryChooser();
-        iconPath = chooser.showDialog(null).toString();
+        iconPath = chooser.showDialog(primaryStage).toString();
         System.out.println(iconPath);
     }
 
 
+    // For the main context pack. Pushing either Radio button will trigger this and set the "enabled" field
     public void setIsEnabled (ActionEvent event) {
         if ( ((RadioButton) event.getSource()).getId().equals("enabled") ) {
             isEnabled = true;
@@ -123,14 +124,13 @@ public class Controller {
             }
         }
 
-        Map treemap = new TreeMap<String, Object>(contextPackMap);
         String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap);
         System.out.println(jsonFromJavaMap);
-        String jsonFromJavaMap2 = gsonBuilder.toJson(treemap);
 
         try (Writer writer = new FileWriter(contextPackName + ".json")) {
             gsonBuilder.toJson(contextPackMap, writer);
         }
+
     }
 
 
@@ -226,6 +226,33 @@ public class Controller {
         }
         System.out.println("COMPLETE: allWordsForms = " + allWordsForms);
         return allWordsForms;
+    }
+
+    public void importJson() throws FileNotFoundException {
+        try {
+            Gson gson = new Gson();
+            Map contextPackMap = gson.fromJson(new FileReader(chooseJsonFile()), Map.class);
+            Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
+            String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap);
+            System.out.println(jsonFromJavaMap);
+        }
+        catch (FileNotFoundException fnfe ) {
+            System.out.println("Welp, that sucks.");
+        }
+    }
+
+    public File chooseJsonFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose a JSON file");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON files", ".JSON"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        if (selectedFile != null) {
+            return selectedFile;
+        }
+        return null;
     }
 
 }

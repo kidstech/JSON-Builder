@@ -30,7 +30,7 @@
             </RadioButton>
             <Button fx:id="exportPackButton" layoutX="607.0" layoutY="16.0" mnemonicParsing="false" onAction="#exportContextPack" text="Export Context Pack" />
             <Button fx:id="dirChooser" layoutX="200.0" layoutY="16.0" mnemonicParsing="false" onAction="#chooseDir" prefHeight="25.0" prefWidth="115.0" text="Set Icon directory" />
-            <Button layoutX="517.0" layoutY="16.0" mnemonicParsing="false" text="Import" />
+            <Button fx:id="importJsonButton" layoutX="517.0" layoutY="16.0" mnemonicParsing="false" onAction="#importJson" text="Import" />
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
