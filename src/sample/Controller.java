@@ -212,7 +212,11 @@ public class Controller {
         ArrayList<ArrayList<String>> allWordsForms = new ArrayList<>();
 
         for (Node rootChild : ((Parent) wordFormRoot).getChildrenUnmodifiable()) {
-            if (rootChild.getId().equals("wordForms")) {
+            if (rootChild.getId().equals("wordForms"))  {
+                if ( ((TextField) rootChild).getText().isEmpty() ) {
+                    System.out.println("Found an empty one");
+                    continue;
+                }
                 singleWordForms = new ArrayList<>();
                 // Empty list to add base word / forms
 
