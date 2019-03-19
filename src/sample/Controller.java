@@ -27,12 +27,14 @@ public class Controller {
     Stage primaryStage;
 
     String contextPackName;
-    String iconPath = "not set";
-    Boolean isEnabled = true;
+    String iconPath = "not set"; // directory, not a file
+    Boolean isEnabled = true;  // top-level (contextPack) enabled
 
-    public String[] createWordFormArray(String rawWordForms) {
-        return rawWordForms.split(",");
-    }
+
+
+    //////////////////////////////////////////////////
+    /////////////   General Functions   //////////////
+    //////////////////////////////////////////////////
 
 
     // For choosing the icon directory (not the actual file).
@@ -41,7 +43,6 @@ public class Controller {
         iconPath = chooser.showDialog(primaryStage).toString();
         System.out.println(iconPath);
     }
-
 
     // For the main context pack. Pushing either Radio button will trigger this and set the "enabled" field
     public void setIsEnabled (ActionEvent event) {
@@ -52,7 +53,6 @@ public class Controller {
         }
     }
 
-
     // Creates a new Word-Form TextField.
     public void addNewWord(ActionEvent event) throws IOException {
         Object sourceButton = event.getSource();
@@ -60,7 +60,6 @@ public class Controller {
         Parent newWordBox = FXMLLoader.load(getClass().getResource("wordForms.fxml"));
         parent.getChildren().add(newWordBox);
     }
-
 
     // Creates a new Word-Type field (including a word-form field)
     public void addNewWordType(ActionEvent event) throws IOException {
@@ -70,7 +69,6 @@ public class Controller {
         parent.getChildren().add(newWordPack);
     }
 
-
     // Creates a new WordPack (including word-type / word-form fields)
     public void addNewWordPack(ActionEvent event) throws IOException {
         Object sourceButton = event.getSource();
@@ -78,6 +76,12 @@ public class Controller {
         Parent newSubPack = FXMLLoader.load(getClass().getResource("wordPackBox.fxml"));
         parent.getChildren().add(newSubPack);
     }
+
+
+
+    ///////////////////////////////////////////////
+    ///////////   Export Functions   //////////////
+    ///////////////////////////////////////////////
 
 
     // Exports the current entries into a JSON file
@@ -116,7 +120,7 @@ public class Controller {
                 Node wordPackRoot = ((ScrollPane) topParentChild).getContent();
                 for (Node wordPackBox : ((VBox) wordPackRoot).getChildren()) {
                     if (wordPackBox.getId().equals("wordPackBox")) {
-                        parseWordPack(wordPackBox, contextPackMap);
+                        parseWordPack(wordPackBox, contextPackMap); // See the function below this one...
                         // The wordPackBox contains everything in a word-pack. We pass the node and our
                         // context pack map into the function to add values.
                     }
@@ -124,16 +128,15 @@ public class Controller {
             }
         }
 
-        String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap);
-        System.out.println(jsonFromJavaMap);
+        String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap); //Used for debugging
+        System.out.println(jsonFromJavaMap); // Used for debugging
 
+        // Now for the actual writing...
         try (Writer writer = new FileWriter(contextPackName + ".json")) {
             gsonBuilder.toJson(contextPackMap, writer);
         }
 
     }
-
-
 
     public void parseWordPack(Node wordPackBox, Map contextPackMap) {
         Map wordPackMap = new HashMap();
@@ -145,7 +148,7 @@ public class Controller {
 
             if (wordPackChild.getId().equals("wordTypeRoot")) {
                 // Now we get the word types.
-                parseWordTypes(wordPackChild, wordPackMap);
+                parseWordTypes(wordPackChild, wordPackMap); // See function below this one...
             }
 
             else if (wordPackChild.getId().equals("wordPackInfo")) {
@@ -177,26 +180,28 @@ public class Controller {
         contextPackMap.put(wordPackName, wordPackMap);
     }
 
-
-
     public void parseWordTypes(Node wordTypeRoot, Map wordPackMap) {
         for (Node rootChild : ((Parent) wordTypeRoot).getChildrenUnmodifiable()) {
 
             if (rootChild.getId().equals("wordTypeBox")) {
-                String wordType = "notFound";
-                for (Node boxChild : ((Parent) rootChild).getChildrenUnmodifiable()) {
-                    if (boxChild.getId().equals("wordTypeInfo")) {
+                String wordType = "notFound"; // in case it never gets set
 
+                for (Node boxChild : ((Parent) rootChild).getChildrenUnmodifiable()) {
+
+                    // This is where we find the word-type field (noun, adjective, etc).
+                    if (boxChild.getId().equals("wordTypeInfo")) {
                         for (Node infoChild : ((VBox) boxChild).getChildren()) {
                             if (infoChild.getId().equals("chooseWordType")) {
                                 wordType = ((TextField) infoChild).getText();
-                                System.out.println("FOUND WORD TYPE = " + wordType);
+                                System.out.println("FOUND WORD TYPE = " + wordType); // for debugging
                             }
                         }
                     }
+
+                    // This where we find the subtree for word-forms
                     else if (boxChild.getId().equals("wordFormRoot")) {
-                        wordPackMap.put(wordType, parseWordForms(boxChild));
-                        System.out.println("wordPackMap updated to = " + wordPackMap);
+                        wordPackMap.put(wordType, parseWordForms(boxChild)); // see function below...
+                        System.out.println("wordPackMap updated to = " + wordPackMap); // for debugging
                     }
                 }
             }
@@ -232,25 +237,36 @@ public class Controller {
         return allWordsForms;
     }
 
+
+
+    ////////////////////////////////////////////////
+    /////////////   Import Functions   /////////////
+    ////////////////////////////////////////////////
+
+
     public void importJson() throws FileNotFoundException {
         try {
             Gson gson = new Gson();
             Map contextPackMap = gson.fromJson(new FileReader(chooseJsonFile()), Map.class);
-            Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
-            String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap);
-            System.out.println(jsonFromJavaMap);
+            // Here, we are converting a json file into a hashmap, which makes it easy to deal with later.
+
+            Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create(); // for debugging
+            String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap); // for debugging
+            System.out.println(jsonFromJavaMap); // for debugging
         }
         catch (FileNotFoundException fnfe ) {
-            System.out.println("Welp, that sucks.");
+            System.out.println("Welp, that sucks.... The file wasn't found! ");
         }
     }
 
+    // This function is only used by importJson().
     public File chooseJsonFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose a JSON file");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("JSON files", ".JSON"),
+                new FileChooser.ExtensionFilter("JSON files", "*.JSON"),
                 new FileChooser.ExtensionFilter("All Files", "*.*")
+                // optional, just in case real json objects aren't being recognized
         );
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
         if (selectedFile != null) {
