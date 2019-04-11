@@ -20,7 +20,7 @@ public class Main extends Application {
 
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         Scene scene = new Scene(root);
-        primaryStage.setTitle("Context Pack Buildber");
+        primaryStage.setTitle("Context Pack Builder");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

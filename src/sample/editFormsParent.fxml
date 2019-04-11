@@ -1,0 +1,18 @@
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<HBox fx:id="newFormsParent" prefHeight="26.0" prefWidth="342.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+    <children>
+        <TextField fx:id="wordForms" prefHeight="25.0" prefWidth="306.0" promptText="Baseword, form1, form2, form3, etc.">
+            <HBox.margin>
+                <Insets top="5.0" />
+            </HBox.margin>
+        </TextField>
+        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveWordForms" prefHeight="25.0" prefWidth="70.0" text="Save">
+            <HBox.margin>
+                <Insets left="3.0" top="5.0" />
+            </HBox.margin>
+        </Button>
+    </children>
+</HBox>

@@ -9,16 +9,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jdk.nashorn.internal.parser.JSONParser;
 
 import java.io.*;
+import java.sql.SQLOutput;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class Controller {
 
@@ -26,9 +29,12 @@ public class Controller {
     AnchorPane topParent;
     Stage primaryStage;
 
+    String qwe = "{ \"first\": \"first value\", \"second\": \"second value\" }";
     String contextPackName;
     String iconPath = "not set"; // directory, not a file
     Boolean isEnabled = true;  // top-level (contextPack) enabled
+
+    Map contextPackMap = new HashMap();
 
 
 
@@ -77,10 +83,151 @@ public class Controller {
         parent.getChildren().add(newSubPack);
     }
 
+    public void saveWordForms(ActionEvent event) throws IOException {
+
+        String forms = "forms"; // To hold the word forms saved
+        Button saveButton = (Button) event.getSource(); // source button
+        HBox newFormsParent = (HBox) saveButton.getParent();
+        // Parent gets casted to HBox, so we may modify its children.
+
+        // Here we grab the word forms from the textfield and store them for later.
+        for (Node child : newFormsParent.getChildren() )  {
+            if (child.getId().equals("wordForms")) {
+                forms = ((TextField) child).getText();
+                break;
+            }
+        }
+
+        // Now we have to remove newFormsParent and replace it with savedFormsParent
+        // Start at the parent of newFormsParent
+        VBox wordFormsRoot = (VBox)newFormsParent.getParent();
+
+        // Since newFormsParent is always the last child, we can delete it by index.
+        wordFormsRoot.getChildren().remove(wordFormsRoot.getChildren().size() - 1); // delete newFormsParent
+
+        // Now we create the new node and update it's child to contain our word-forms
+        HBox savedFormsParent = FXMLLoader.load(getClass().getResource("savedFormsParent.fxml"));
+        for (Node child : savedFormsParent.getChildren()) {
+            if (child.getId().equals("savedForms")) {
+                ((Label) child).setText(forms);
+                System.out.println(forms);
+                break;
+            }
+        }
+
+        // Finally we assign this as a child of wordFormsRoot
+        wordFormsRoot.getChildren().add(savedFormsParent);
+
+        // Now it's time to add newFormsParent so we can continue adding word forms
+        newFormsParent = FXMLLoader.load(getClass().getResource("newFormsParent.fxml"));
+        wordFormsRoot.getChildren().add(newFormsParent);
+    }
+
+    public void saveEditedWordForms(ActionEvent event) throws IOException{
+
+        String forms = "forms"; // To hold the word forms saved
+        Button saveButton = (Button) event.getSource(); // source button
+
+        // Get the parent and cast it to HBox.
+        HBox newFormsParent = (HBox) saveButton.getParent();
+
+        // Here we grab the word forms from the textfield and store them for later.
+        for (Node child : newFormsParent.getChildren() )  {
+            if (child.getId().equals("wordForms")) {
+                forms = ((TextField) child).getText();
+                break;
+            }
+        }
+
+        // Now we have to remove newFormsParent and replace it with savedFormsParent
+        // First we'll reset the id, so we can easily find it later.
+        newFormsParent.setId("toBeReplaced");
+
+        VBox wordFormsRoot = (VBox)newFormsParent.getParent();
+        int indexCounter = 0;
+        for (Node child : wordFormsRoot.getChildren() ) {
+            if (child.getId().equals("toBeReplaced")) {
+                wordFormsRoot.getChildren().remove(indexCounter);
+                break;
+            }
+            indexCounter++;
+        }
+
+        // Now we create the new node
+        HBox savedFormsParent = FXMLLoader.load(getClass().getResource("savedFormsParent.fxml"));
+
+        // Find the 'savedForms' child of savedFormsParent and set the text the old forms
+        for (Node child : savedFormsParent.getChildren()) {
+            if (child.getId().equals("savedForms")) {
+                ((Label) child).setText(forms);
+                break;
+            }
+        }
+
+        // Finally, update wordFormsRoot children to contain an updated savedFormsParent
+        wordFormsRoot.getChildren().add(indexCounter, savedFormsParent);
+
+    }
+
+    public void deleteWordForms(ActionEvent event) {
+        // We need to find the element to be deleted
+        // Start at the button..
+        Button deleteButton = (Button) event.getSource();
+
+        // We go to the button's parent, and mark it for deletion
+        HBox savedFormsParent = (HBox) deleteButton.getParent();
+        savedFormsParent.setId("toBeDeleted");
+
+        // Now we go to the parent of the element "toBeDeleted" and remove the appropriate child...
+        VBox wordFormsRoot = (VBox) savedFormsParent.getParent();
+        wordFormsRoot.getChildren().remove(savedFormsParent);
+
+    }
+
+    public void editWordForms(ActionEvent event) {
+        String forms = "forms";
+
+        Button editButton = (Button) event.getSource(); // source button
+        HBox savedFormsParent = (HBox) editButton.getParent();
+        forms = ((Label) savedFormsParent.getChildren().get(0)).getText(); // getting the forms
+        savedFormsParent.setId("toBeRemoved");
+        VBox wordFormsRoot = (VBox)(savedFormsParent.getParent());
+
+        int indexCount = 0;
+        for (Node child : wordFormsRoot.getChildren()) {
+            if (child.getId().equals("toBeRemoved")) {
+                wordFormsRoot.getChildren().remove(indexCount);
+                break;
+            }
+            indexCount++;
+        }
+
+        // Now we replace them with a textfield
+        // An IOException may be thrown...
+        try {
+            //Exception can get thrown on the line below
+            HBox newFormsParent = FXMLLoader.load(getClass().getResource("tempNewFormsParent.fxml"));
+
+            // Now find the wordForms TextField in the new element, and place the old word forms in there
+            for (Node child : newFormsParent.getChildren()) {
+                if (child.getId().equals("wordForms")) {
+                    ((TextField) child).setText(forms);
+
+                    // Once done, the new element to the wordFormsRoot children and break the loop
+                    wordFormsRoot.getChildren().add(indexCount, newFormsParent);
+                    break;
+                }
+            }
+        }
+        catch (IOException ioException) {
+            System.out.println("There was a problem loading \"newFormsParent.fxml\". ");
+        }
+
+    }
 
 
     ///////////////////////////////////////////////
-    ///////////   Export Functions   //////////////
+    //////////    Export Functions   //////////////
     ///////////////////////////////////////////////
 
 
@@ -89,7 +236,6 @@ public class Controller {
     public void exportContextPack(ActionEvent event) throws IOException {
 
         Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
-        Map contextPackMap = new HashMap();
 
         // We start at the top level (The Context-Pack Level).
         // Icon/enabled are set first.
@@ -199,7 +345,7 @@ public class Controller {
                     }
 
                     // This where we find the subtree for word-forms
-                    else if (boxChild.getId().equals("wordFormRoot")) {
+                    else if (boxChild.getId().equals("wordFormsRoot")) {
                         wordPackMap.put(wordType, parseWordForms(boxChild)); // see function below...
                         System.out.println("wordPackMap updated to = " + wordPackMap); // for debugging
                     }
@@ -208,7 +354,7 @@ public class Controller {
         }
     }
 
-    public ArrayList<ArrayList<String>> parseWordForms(Node wordFormRoot) {
+    public ArrayList<ArrayList<String>> parseWordForms(Node wordFormsRoot) {
 
         // This list will be used to hold a base word / word forms.
         ArrayList<String> singleWordForms;
@@ -216,27 +362,29 @@ public class Controller {
         // This list of lists will hold all the smaller lists.
         ArrayList<ArrayList<String>> allWordsForms = new ArrayList<>();
 
-        for (Node rootChild : ((Parent) wordFormRoot).getChildrenUnmodifiable()) {
-            if (rootChild.getId().equals("wordForms"))  {
-                if ( ((TextField) rootChild).getText().isEmpty() ) {
-                    System.out.println("Found an empty one");
-                    continue;
-                }
-                singleWordForms = new ArrayList<>();
-                // Empty list to add base word / forms
+        for (Node rootChild : ((Parent) wordFormsRoot).getChildrenUnmodifiable()) {
+            if (rootChild.getId().equals("savedFormsParent"))  {
+                for (Node newFormsChild : ((Parent) rootChild).getChildrenUnmodifiable()) {
+                    if (newFormsChild.getId().equals("savedForms")) {
+                        if ( ((Label) newFormsChild).getText().isEmpty() ) {
+                            System.out.println("Found an empty one");
+                            continue;
+                        }
+                        singleWordForms = new ArrayList<>();
 
-                String[] formsArray = ((TextField) rootChild).getText().split(",[ ]*");
-                for (String form : formsArray) {
-                    singleWordForms.add(form);
+                        String[] formsArray = ((Label) newFormsChild).getText().split(",[ ]*");
+                        for (String form: formsArray) {
+                            singleWordForms.add(form);
+                        }
+                        allWordsForms.add(singleWordForms);
+                        System.out.println("allWordsForms updated to " + allWordsForms);
+                    }
                 }
-                allWordsForms.add(singleWordForms); // add the smaller list to larger list.
             }
-            System.out.println("allWordsForms updated to " + allWordsForms);
         }
         System.out.println("COMPLETE: allWordsForms = " + allWordsForms);
         return allWordsForms;
     }
-
 
 
     ////////////////////////////////////////////////
@@ -244,18 +392,23 @@ public class Controller {
     ////////////////////////////////////////////////
 
 
-    public void importJson() throws FileNotFoundException {
+    public void importJson(ActionEvent event)  {
         try {
             Gson gson = new Gson();
             Map contextPackMap = gson.fromJson(new FileReader(chooseJsonFile()), Map.class);
             // Here, we are converting a json file into a hashmap, which makes it easy to deal with later.
+            analyzeJSON(contextPackMap);
 
             Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create(); // for debugging
             String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap); // for debugging
-            System.out.println(jsonFromJavaMap); // for debugging
+
+            resetScene(event);
+
+            System.out.println(jsonFromJavaMap);
+
         }
-        catch (FileNotFoundException fnfe ) {
-            System.out.println("Welp, that sucks.... The file wasn't found! ");
+        catch (Exception fnfe ) {
+            System.out.println("Welp, that sucks.... something broke. ");
         }
     }
 
@@ -263,6 +416,9 @@ public class Controller {
     public File chooseJsonFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose a JSON file");
+
+        // this just sets the dialog directory to whatever the project folder is
+        fileChooser.setInitialDirectory( new File(System.getProperty("user.dir")) );
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("JSON files", "*.JSON"),
                 new FileChooser.ExtensionFilter("All Files", "*.*")
@@ -274,6 +430,25 @@ public class Controller {
         }
         return null;
     }
+
+    // This gives us a new scene to work in our
+    public void resetScene(ActionEvent event) throws IOException{
+
+        Parent freshTemplate = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Scene freshScene = new Scene(freshTemplate);
+
+        Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
+        window.setScene(freshScene);
+
+        window.show();
+    }
+
+    public void analyzeJSON(Map json) {
+        System.out.println(iconPath);
+        iconPath = (String)json.get("icon");
+        System.out.println(iconPath);
+    }
+
 
 }
 
