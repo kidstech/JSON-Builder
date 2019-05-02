@@ -27,6 +27,14 @@ public class Controller {
 
     @FXML
     AnchorPane topParent;
+    @FXML
+    HBox infoHBox;
+    @FXML
+    TextField contextPackNameField;
+    @FXML
+    VBox wordPackRoot;
+
+
     Stage primaryStage;
 
     String qwe = "{ \"first\": \"first value\", \"second\": \"second value\" }";
@@ -35,6 +43,8 @@ public class Controller {
     Boolean isEnabled = true;  // top-level (contextPack) enabled
 
     Map contextPackMap = new HashMap();
+
+    boolean firstWordFormsDone;
 
 
     //////////////////////////////////////////////////
@@ -69,10 +79,10 @@ public class Controller {
     // Creates a new Word-Type field (including a word-form field)
     public void addNewWordType(ActionEvent event) {
         try {
-            Object sourceButton = event.getSource();
-            VBox parent = (VBox) ((Button) sourceButton).getParent().getParent().getParent();
-            Parent newWordPack = FXMLLoader.load(getClass().getResource("wordTypeBox.fxml"));
-            parent.getChildren().add(newWordPack);
+            Button sourceButton = (Button) event.getSource();
+            VBox wordTypeRoot = (VBox) sourceButton.getParent().getParent().getParent();
+            Parent newWordTypeBox = FXMLLoader.load(getClass().getResource("wordTypeBox.fxml"));
+            wordTypeRoot.getChildren().add(newWordTypeBox);
         }
         catch (IOException ioException) {
             System.out.println("addNewWordType failed");
@@ -83,10 +93,8 @@ public class Controller {
     // Creates a new WordPack (including word-type / word-form fields)
     public void addNewWordPack(ActionEvent event) {
         try {
-            Object sourceButton = event.getSource();
-            VBox parent = (VBox) ((Button) sourceButton).getParent().getParent().getParent();
             Parent newSubPack = FXMLLoader.load(getClass().getResource("wordPackBox.fxml"));
-            parent.getChildren().add(newSubPack);
+            wordPackRoot.getChildren().add(newSubPack);
         }
         catch (IOException ioException) {
             System.out.println("addNewWordPack failed");
@@ -99,7 +107,6 @@ public class Controller {
         String forms = "forms"; // To hold the word forms saved
         Button saveButton = (Button) event.getSource(); // source button
         HBox newFormsParent = (HBox) saveButton.getParent();
-        // Parent gets casted to HBox, so we may modify its children.
 
         // Here we grab the word forms from the textfield and store them for later.
         for (Node child : newFormsParent.getChildren() )  {
@@ -256,32 +263,26 @@ public class Controller {
         // Now we start to set the other values. Use event.getSource() to get the button where the event originated.
         // Then, use getParent() to get element containing the button.
         Object sourceButton = event.getSource();
-        Parent topAnchor = ((Button) sourceButton).getParent(); // Cast it to a button, so we can getParent().
+        Parent topAnchor = ((Button) sourceButton).getParent().getParent().getParent(); // Cast it to a button, so we can getParent().
 
         // Names like 'topAnchor' are the actual fxID's of the objects they reference. This was done on purpose, so
         // that we can follow along in the scenebuilder, to be sure we are selecting the correct objects.
 
         // Here we get the name of the context pack.
-        for (Node topAnchorChild : topAnchor.getChildrenUnmodifiable()) {
-            if (topAnchorChild.getId().equals("contextPackNameField")) {
-                contextPackName = ((TextField) topAnchorChild).getText();
-                break;
-                // We break it there, since we were only looking for one thing.
-            }
-        }
-
-        // "topParent" is the top of the entire tree. Now we work our way down towards the word-packs.
-        Parent topParent =  topAnchor.getParent();
-        for (Node topParentChild : topParent.getChildrenUnmodifiable() ) {
-            if (topParentChild.getId().equals("topScrollPane")) {
-                Node wordPackRoot = ((ScrollPane) topParentChild).getContent();
-                for (Node wordPackBox : ((VBox) wordPackRoot).getChildren()) {
-                    if (wordPackBox.getId().equals("wordPackBox")) {
-                        parseWordPack(wordPackBox, contextPackMap); // See the function below this one...
-                        // The wordPackBox contains everything in a word-pack. We pass the node and our
-                        // context pack map into the function to add values.
-                    }
+            for (Node child : infoHBox.getChildren() ) {
+                if (child.getId().equals("contextPackNameField")) {
+                    contextPackName = ((TextField) child).getText();
+                    System.out.println(contextPackName);
+                    break;
                 }
+            }
+
+
+        for (Node wordPackBox : wordPackRoot.getChildren()) {
+            if (wordPackBox.getId().equals("wordPackBox")) {
+                parseWordPack(wordPackBox, contextPackMap); // See the function below this one...
+                // The wordPackBox contains everything in a word-pack. We pass the node and our
+                // context pack map into the function to add values.
             }
         }
 
@@ -408,6 +409,7 @@ public class Controller {
         ImportHelper importHelper = new ImportHelper();
 
         Gson gson = new Gson();
+
         Map contextPackMap = gson.fromJson(new FileReader(chooseJsonFile()), Map.class);
 
         // First thing, set the current icon path to what is retrieved from the JSON
@@ -417,17 +419,44 @@ public class Controller {
 //        String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap); // for debugging
 
         // Create a fresh template that we can work with and modify
-        Parent freshtemplate = resetScene(event);
+        Parent freshTemplate = resetScene(event);
 
         System.out.println(contextPackMap);
 
-        // If top-level enabled is set to false, then we need to change the radio button.
-        if (contextPackMap.get("enabled").equals(false)) {
-            // Go through the top-level children and find "topAnchor"
-            for (Node child : freshtemplate.getChildrenUnmodifiable()) {
-                if ( child.getId().equals("topAnchor") ) {
-                    // Then call the importHelper to set the enabled button to false.
-                    importHelper.setTopEnabledButton(child);
+        // Here we set the contextPackNameField
+        for (Node child : freshTemplate.getChildrenUnmodifiable()) {
+
+        }
+
+//        // If top-level enabled is set to false, then we need to change the radio button.
+//        if (contextPackMap.get("enabled").equals(false)) {
+//            // Go through the top-level children and find "topAnchor"
+//            for (Node child : freshTemplate.getChildrenUnmodifiable()) {
+//                if ( child.getId().equals("topAnchor") ) {
+//                    // Then call the importHelper to set the enabled button to false.
+//                    importHelper.setTopEnabledButton(child);
+//                }
+//            }
+//        }
+
+        for (Node child : freshTemplate.getChildrenUnmodifiable()) {
+            if ( child.getId().equals("topAnchor") ) {
+                for ( Node topChild : ((AnchorPane) child).getChildren() ) {
+                    if (topChild.getId().equals("infoHBox")) {
+                        for (Node infoChild : ((HBox) topChild).getChildren()) {
+                            if (infoChild.getId().equals("contextPackNameField")) {
+                                ((TextField) infoChild).setText(contextPackName);
+                            }
+                            if (contextPackMap.get("enabled").equals(false) &&
+                                    infoChild.getId().equals("enabled")) {
+                                ((RadioButton) infoChild).setSelected(false);
+                            }
+                            if (contextPackMap.get("enabled").equals(false) &&
+                                    infoChild.getId().equals("disabled")) {
+                                ((RadioButton) infoChild).setSelected(true);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -437,7 +466,7 @@ public class Controller {
         contextPackMap.keySet().remove("icon");
 
         VBox wordPackRoot;
-        for (Node child : freshtemplate.getChildrenUnmodifiable()) {
+        for (Node child : freshTemplate.getChildrenUnmodifiable()) {
             if (child.getId().equals("topScrollPane")) {
                 // For a scrollpane, we have to call getContent instead of getChildren
                 wordPackRoot = (VBox) ((ScrollPane) child).getContent();
@@ -456,7 +485,7 @@ public class Controller {
 
     public void populateWordPacks(VBox wordPackRoot, Map contextPackMap) {
 
-        // In theory, the wordPackRoot's only children are wordPackBoxes, and there should be an equal amound of children
+        // In theory, the wordPackRoot's only children are wordPackBoxes, and there should be an equal amount of children
         // as there are keys left in our contextPackMap. We can use a counter to iterate through both at the same time.
 
         // We should check they are equal though.
@@ -468,8 +497,10 @@ public class Controller {
         }
 
         // If they are equal, we move forward...
+        // For each wordPack in the map...
         for (int i = 0; i < contextPackMap.keySet().size(); i++) {
-
+            firstWordFormsDone = false;
+            System.out.println("first word forms set to false");
             // extract the current key so we can use it later
             String currKey = (String) contextPackMap.keySet().toArray()[i];
             System.out.println("Currkey is " + currKey);
@@ -482,11 +513,11 @@ public class Controller {
             // Now we check to see if the disabled button needs to be 'checked'
             for (Node child : wordPackBox.getChildren()) {
                 if (child.getId().equals("wordPackInfo")) {
-                    System.out.println("Found wordPackInfo");
                     for (Node subChild : ((VBox) child).getChildren() ) {
                         if (subChild.getId().equals("wordPackNameField")) {
                             System.out.println("Found wordPackNameField");
                             ((TextField) subChild).setText(currKey);
+                            System.out.println("wordPack name set to " + currKey);
                         }
                         if (subChild.getId().equals("wordPackEnabled")
                         && subPackMap.get("enabled").equals(false)) {
@@ -495,7 +526,9 @@ public class Controller {
                         if (subChild.getId().equals("wordPackDisabled")
                                 && subPackMap.get("enabled").equals(false)) {
                             ((RadioButton) subChild).setSelected(true);
+                            System.out.println("Disabled set to true");
                         }
+                        else {System.out.println("status is enabled. leaving button alone");}
                     }
                 }
                 if (child.getId().equals("wordTypeRoot")) {
@@ -503,7 +536,9 @@ public class Controller {
                     for (int j=0; j<subPackMap.keySet().size()-2; j++) {
                         // importHelper will append a wordPackBox as a child
                         importHelper.addChildWordTypeBox((VBox) child);
+                        System.out.println("added a word type box");
                     }
+                    System.out.println("now populating word types...");
                     populateWordTypes((VBox) child, subPackMap);
                 }
             }
@@ -512,6 +547,9 @@ public class Controller {
     }
 
     public void populateWordTypes(VBox wordTypeRoot, Map subPackMap) {
+
+        System.out.println("populating word types...");
+
         subPackMap.remove("enabled"); // discard this key, since we don't need it in this scope.
         // Just like in the populateWordPack's method , the wordTypeRoot's only children are wordPackBoxes, and there
         // should be an equal amount of children as there are keys left in our contextPackMap.
@@ -528,9 +566,12 @@ public class Controller {
         // If they are equal, we move forward...
         for (int i = 0; i < subPackMap.keySet().size(); i++) {
 
+            // This switch is needed from the next function (populateWordForms). It needs to be set now, and it will be
+            //  be reset many times later (explained in the next function).
+
             // extract the current key so we can use it later
             String currKey = (String) subPackMap.keySet().toArray()[i];
-            System.out.println("Currkey for subPack is " + currKey);
+            System.out.println("Currkey for wordType is " + currKey);
 
             // Now take that key and make a map out of its values
             ArrayList wordFormsArray = (ArrayList) subPackMap.get(currKey);
@@ -543,14 +584,17 @@ public class Controller {
                     for (Node subChild : ((VBox) child).getChildren() ) {
                         if (subChild.getId().equals("chooseWordType")) {
                             ((TextField) subChild).setText(currKey);
+                            System.out.println("Set wordType label to " + currKey);
                         }
                     }
                 }
                 if (child.getId().equals("wordFormsRoot")) {
                     ImportHelper importHelper = new ImportHelper();
-                    for (int j = 0; j < wordFormsArray.size()-1; j++) {
-                        importHelper.addChildNewFormsParent((VBox) child);
+                    for (int j = 0; j < wordFormsArray.size(); j++) {
+                        importHelper.addChildSavedFormsParent((VBox) child);
+                        System.out.println("adding label for wordForms");
                     }
+                    System.out.println("populating word forms...");
                     populateWordForms((VBox) child, wordFormsArray);
                 }
             }
@@ -563,10 +607,30 @@ public class Controller {
         // wordFormsRoot always has a generic Pane as it's first child (this is done for spacing)
         // Therefore, we need to check ArrayList and child number equality differently (by using minus 1).
 
-        if (wordFormsArray.size() == wordFormsRoot.getChildren().size() - 1) {
-            System.out.println("wordFormsArray is equal to wordFormsRoot children size - 1");
+        int boolInt;
+        int notBoolInt;
+
+        // if the first word forms of the wordPack are not done...
+        if (!firstWordFormsDone) {
+            boolInt = 1;
+            System.out.println("boolint set to " + boolInt);
         } else {
-            System.out.println("ERROR: wordFormsArray is NOT equal to wordFormsRoot children size - 1");
+            boolInt = 0;
+            System.out.println("boolint set to " + boolInt);
+        }
+
+        System.out.println("Bool int = " + boolInt);
+
+        if (wordFormsArray.size()  == wordFormsRoot.getChildren().size() - (1 + boolInt ) ) {
+            System.out.println("equality good");
+            System.out.println("Array size: " + wordFormsArray.size()   );
+            System.out.println("Children number: " + String.valueOf(wordFormsRoot.getChildren().size() ) );
+            System.out.println("minus " + String.valueOf((1 + boolInt)));
+        } else {
+            System.out.println("ERROR: not equal!");
+            System.out.println("Array size: " + wordFormsArray.size() );
+            System.out.println("Children number: " + String.valueOf(wordFormsRoot.getChildren().size() ) );
+            System.out.println("minus " + String.valueOf((1 + boolInt)) );
             return;
         }
 
@@ -576,16 +640,18 @@ public class Controller {
             ArrayList<String> currArray = wordFormsArray.get(i);
 
             // The current newFormsParent that we are putting those forms into
-            HBox currFormsParent = (HBox) wordFormsRoot.getChildren().get(i+1);
+            HBox currFormsParent = (HBox) wordFormsRoot.getChildren().get(i+boolInt);
 
-            for (Node child  : currFormsParent.getChildren()) {
-                if (child.getId().equals("wordForms")) {
+            for (Node child  : currFormsParent.getChildren() ) {
+                if (child.getId().equals("savedForms")) {
+                    System.out.println("saved Forms FOUND");
                     String formsString = currArray.toString();
                     formsString = formsString.replace("[", "").replace("]", "");
-                    ((TextField) child).setText(formsString);
+                    ((Label) child).setText(formsString);
                 }
             }
         }
+        firstWordFormsDone = true;
         System.out.println("DONE!!!!!!!!!!#######");
 
 
@@ -616,6 +682,10 @@ public class Controller {
                 // optional, just in case real json objects aren't being recognized
         );
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        String[] fileArray = selectedFile.toString().split("\\\\");
+        String fileString = fileArray[fileArray.length-1].replace(".json", "");
+        contextPackName = fileString;
+        System.out.println("file string is " + fileString);
         if (selectedFile != null) {
             return selectedFile;
         }

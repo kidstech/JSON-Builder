@@ -15,10 +15,12 @@ import java.sql.SQLOutput;
 
 public class Main extends Application {
 
+    public Parent root;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setTitle("Context Pack Builder");
         primaryStage.setScene(scene);
