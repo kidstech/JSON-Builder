@@ -39,30 +39,25 @@ public class ImportHelper {
         }
     }
 
-    public void addChildNewFormsParent(VBox wordFormsRoot) {
+    public void addChildSavedFormsParent(VBox wordFormsRoot) {
+
+        int offset = 0;
+        // In the case that the wordFormsRoot has an empty spacer at the top,
+        // we have to add children at a different index (add at 1, instead of 0 since the spacer is at 0).
+        for (Node child : wordFormsRoot.getChildren()) {
+            if (child.getId().equals("emptySpace")) {
+                offset = 1;
+            }
+        }
         try {
             // Grab the newFormsParent template from resources and make those a child of wordFormsRoot
-            Parent newFormsParent = FXMLLoader.load(getClass().getResource("newFormsParent.fxml"));
-            wordFormsRoot.getChildren().add(newFormsParent);
+            Parent savedFormsParent = FXMLLoader.load(getClass().getResource("savedFormsParent.fxml"));
+            wordFormsRoot.getChildren().add(0 + offset, savedFormsParent);
         }
         catch (IOException ioException) {
-            System.out.println("There was a problem loading newFormsParent.fxml");
+            System.out.println("There was a problem loading savedFormsParent.fxml");
             System.out.println(ioException);
         }
     }
-
-    public void setTopEnabledButton(Node child) {
-        for (Node subchild : ((AnchorPane) child).getChildren()) {
-            // If it's the RadioButton that sets enabled...
-            if (subchild.getId().equals("Enabled")) {
-                ((RadioButton) subchild).setSelected(false); // set enabled to false
-            }
-            // If it's the RadioButton that sets disabled...
-            if (subchild.getId().equals("Disabled")) {
-                ((RadioButton) subchild).setSelected(true); // set disabled to true
-            }
-        }
-    }
-
 
 }
