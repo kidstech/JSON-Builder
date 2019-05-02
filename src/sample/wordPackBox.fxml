@@ -55,7 +55,7 @@
                             </VBox>
                             <VBox fx:id="wordFormsRoot" prefHeight="112.0" prefWidth="534.0">
                                 <children>
-                                    <Pane fx:id="blankSpace" minHeight="25.0" minWidth="376.0" prefHeight="25.0" prefWidth="376.0" />
+                                    <Pane fx:id="emptySpace" minHeight="25.0" minWidth="376.0" prefHeight="25.0" prefWidth="376.0" />
                                     <HBox fx:id="newFormsParent" prefHeight="26.0" prefWidth="342.0">
                                         <children>
                                             <TextField fx:id="wordForms" prefHeight="25.0" prefWidth="306.0" promptText="Baseword, form1, form2, form3, etc.">

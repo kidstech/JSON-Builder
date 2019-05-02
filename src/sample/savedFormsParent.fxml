@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<?import javafx.scene.image.ImageView?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
-<HBox fx:id="savedFormsParent" prefHeight="26.0" prefWidth="342.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+
+<HBox fx:id="savedFormsParent" prefHeight="26.0" prefWidth="342.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
         <children>
-            <Label fx:id="savedForms" prefHeight="25.0" prefWidth="306.0" text="Form1, form2, form3, form4">
+            <Label fx:id="savedForms" prefHeight="25.0" prefWidth="306.0" style="-fx-background-color: #eeeeee;" text="Form1, form2, form3, form4">
                 <padding>
-                    <Insets top="5.0" />
+                    <Insets left="6.0" top="5.0" />
                 </padding>
                 <opaqueInsets>
                     <Insets />
@@ -30,6 +29,9 @@
                         </image>
                     </ImageView>
                 </graphic>
+         <effect>
+            <DropShadow color="#0003cf44" height="14.32" radius="6.845000000000001" width="15.06" />
+         </effect>
             </Button>
             <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteWordForms" prefHeight="25.0" prefWidth="17.0">
                 <HBox.margin>
@@ -42,6 +44,9 @@
                         </image>
                     </ImageView>
                 </graphic>
+         <effect>
+            <DropShadow color="#110d594f" height="14.5" radius="6.875" width="15.0" />
+         </effect>
             </Button>
         </children>
     </HBox>

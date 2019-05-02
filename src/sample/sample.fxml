@@ -15,29 +15,51 @@
    <children>
       <AnchorPane fx:id="topAnchor" layoutX="18.0" layoutY="14.0" prefHeight="76.0" prefWidth="735.0">
          <children>
-            <TextField fx:id="contextPackNameField" layoutX="21.0" layoutY="16.0" promptText="context pack name" />
-            <RadioButton fx:id="enabled" layoutX="357.0" layoutY="18.0" mnemonicParsing="false" onAction="#setIsEnabled" selected="true" text="Enabled">
-               <padding>
-                  <Insets bottom="5.0" />
-               </padding>
-               <toggleGroup>
-                  <ToggleGroup fx:id="contextPackRadio" />
-               </toggleGroup>
-            </RadioButton>
-            <RadioButton fx:id="disabled" layoutX="436.0" layoutY="18.0" mnemonicParsing="false" onAction="#setIsEnabled" text="Disabled" toggleGroup="$contextPackRadio">
-               <padding>
-                  <Insets bottom="5.0" />
-               </padding>
-            </RadioButton>
-            <Button fx:id="exportPackButton" layoutX="607.0" layoutY="16.0" mnemonicParsing="false" onAction="#exportContextPack" text="Export Context Pack" />
-            <Button fx:id="dirChooser" layoutX="200.0" layoutY="16.0" mnemonicParsing="false" onAction="#chooseDir" prefHeight="25.0" prefWidth="115.0" text="Set Icon directory" />
-            <Button fx:id="importJsonButton" layoutX="517.0" layoutY="16.0" mnemonicParsing="false" onAction="#importJson" text="Import" />
+            <HBox fx:id="infoHBox" prefHeight="34.0" prefWidth="745.0">
+               <children>
+                  <TextField fx:id="contextPackNameField" promptText="context pack name">
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Button fx:id="dirChooser" mnemonicParsing="false" onAction="#chooseDir" prefHeight="25.0" prefWidth="115.0" text="Set Icon directory">
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                  </Button>
+                  <RadioButton fx:id="enabled" mnemonicParsing="false" onAction="#setIsEnabled" selected="true" text="Enabled">
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="contextPackRadio" />
+                     </toggleGroup>
+                     <HBox.margin>
+                        <Insets right="7.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="disabled" mnemonicParsing="false" onAction="#setIsEnabled" text="Disabled" toggleGroup="$contextPackRadio">
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <Button fx:id="importJsonButton" mnemonicParsing="false" onAction="#importJson" text="Import">
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="exportPackButton" mnemonicParsing="false" onAction="#exportContextPack" text="Export Context Pack" />
+               </children>
+            </HBox>
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
       </AnchorPane>
-      <ScrollPane fx:id="topScrollPane" layoutX="26.0" layoutY="71.0" prefHeight="490.0" prefWidth="754.0">
+      <ScrollPane fx:id="topScrollPane" layoutX="26.0" layoutY="91.0" prefHeight="470.0" prefWidth="754.0">
          <content>
             <VBox fx:id="wordPackRoot" prefHeight="112.0" prefWidth="749.0">
                <children>
@@ -79,16 +101,16 @@
                                        </padding>
                                        <children>
                                           <Button fx:id="newWordType" mnemonicParsing="false" onAction="#addNewWordType" prefHeight="25.0" prefWidth="111.0" text="New word type" />
-                                          <TextField fx:id="chooseWordType" promptText="enter type (noun, verb, etc)">
+                                          <TextField fx:id="chooseWordType" prefHeight="25.0" prefWidth="106.0" promptText="enter type (noun, verb, etc)">
                                              <VBox.margin>
                                                 <Insets top="5.0" />
                                              </VBox.margin>
                                           </TextField>
                                        </children>
                                     </VBox>
-                                    <VBox fx:id="wordFormsRoot" prefHeight="112.0" prefWidth="534.0">
+                                    <VBox fx:id="wordFormsRoot" prefHeight="112.0" prefWidth="537.0">
                                        <children>
-                                          <Pane fx:id="blankSpace" minHeight="25.0" minWidth="376.0" prefHeight="25.0" prefWidth="376.0" />
+                                          <Pane fx:id="emptySpace" minHeight="25.0" minWidth="377.0" prefHeight="25.0" prefWidth="377.0" />
                                           <HBox fx:id="newFormsParent" prefHeight="26.0" prefWidth="342.0">
                                              <children>
                                                 <TextField fx:id="wordForms" prefHeight="25.0" prefWidth="306.0" promptText="Baseword, form1, form2, form3, etc.">
