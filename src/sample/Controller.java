@@ -1,5 +1,10 @@
 // Note to developer: As of writing this comment, Gluon makes a version of scene builder that I've been using.
 
+// Note to the KidsTech team....
+
+/// The default directory that the application exports JSON to is inside the project directory.
+/// If this was done from a JAR, it would export to the directory the JAR file was inside.
+
 package sample;
 
 import com.google.gson.*;
