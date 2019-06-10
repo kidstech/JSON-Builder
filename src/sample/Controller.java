@@ -19,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -33,21 +34,28 @@ public class Controller {
     @FXML
     AnchorPane topParent;
     @FXML
+    AnchorPane topAnchor;
+    @FXML
     HBox infoHBox;
     @FXML
     TextField contextPackNameField;
     @FXML
     VBox wordPackRoot;
+    @FXML
+    TextField wordForms;
+    @FXML
+    Label feedback;
+
 
 
     Stage primaryStage;
-
-    String qwe = "{ \"first\": \"first value\", \"second\": \"second value\" }";
     String contextPackName;
-    String iconPath = "not set"; // directory, not a file
+    String iconPath = "not set"; // this is a DIRECTORY, not a filename.
     Boolean isEnabled = true;  // top-level (contextPack) enabled
 
-    Map contextPackMap = new HashMap();
+    Map contextPackMap = new HashMap(); // empty hashmap to be populated and transformed into JSON
+
+    ImportHelper importHelper = new ImportHelper();
 
     boolean firstWordFormsDone;
 
@@ -61,7 +69,8 @@ public class Controller {
     public void chooseDir(ActionEvent event) {
         DirectoryChooser chooser = new DirectoryChooser();
         iconPath = chooser.showDialog(primaryStage).toString();
-        System.out.println(iconPath);
+        feedback.setTextFill(Color.rgb(36, 186, 26));
+        feedback.setText("Icon directory successfully set to: " + iconPath + "!");
     }
 
     // For the main context pack. Pushing either Radio button will trigger this and set the "enabled" field
@@ -73,47 +82,30 @@ public class Controller {
         }
     }
 
-    // Creates a new Word-Form TextField.
-    public void addNewWord(ActionEvent event) throws IOException {
-        Object sourceButton = event.getSource();
-        VBox parent = (VBox) ((Button) sourceButton).getParent();
-        Parent newWordBox = FXMLLoader.load(getClass().getResource("wordForms.fxml"));
-        parent.getChildren().add(newWordBox);
-    }
-
     // Creates a new Word-Type field (including a word-form field)
     public void addNewWordType(ActionEvent event) {
-        try {
-            Button sourceButton = (Button) event.getSource();
-            VBox wordTypeRoot = (VBox) sourceButton.getParent().getParent().getParent();
-            Parent newWordTypeBox = FXMLLoader.load(getClass().getResource("wordTypeBox.fxml"));
-            wordTypeRoot.getChildren().add(newWordTypeBox);
-        }
-        catch (IOException ioException) {
-            System.out.println("addNewWordType failed");
-            System.out.println(ioException);
-        }
+        importHelper.addNewWordType(event);
     }
 
     // Creates a new WordPack (including word-type / word-form fields)
     public void addNewWordPack(ActionEvent event) {
-        try {
-            Parent newSubPack = FXMLLoader.load(getClass().getResource("wordPackBox.fxml"));
-            wordPackRoot.getChildren().add(newSubPack);
-        }
-        catch (IOException ioException) {
-            System.out.println("addNewWordPack failed");
-            System.out.println(ioException);
-        }
+        importHelper.addNewWordPack(event, wordPackRoot);
     }
+
+    /** +
+     *
+     * @param event
+     * @throws IOException
+     */
 
     public void saveWordForms(ActionEvent event) throws IOException {
 
         String forms = "forms"; // To hold the word forms saved
         Button saveButton = (Button) event.getSource(); // source button
-        HBox newFormsParent = (HBox) saveButton.getParent();
+        HBox newFormsParent = (HBox) saveButton.getParent(); // source parent
 
         // Here we grab the word forms from the textfield and store them for later.
+        // The newFormsParent should have ONLY ONE child named 'wordForms'
         for (Node child : newFormsParent.getChildren() )  {
             if (child.getId().equals("wordForms")) {
                 forms = ((TextField) child).getText();
@@ -123,13 +115,14 @@ public class Controller {
 
         // Now we have to remove newFormsParent and replace it with savedFormsParent
         // Start at the parent of newFormsParent
-        VBox wordFormsRoot = (VBox)newFormsParent.getParent();
+        VBox wordFormsRoot = (VBox) newFormsParent.getParent();
 
-        // Since newFormsParent is always the last child, we can delete it by index.
-        wordFormsRoot.getChildren().remove(wordFormsRoot.getChildren().size() - 1); // delete newFormsParent
+        // Since newFormsParent should ALWAYS be the last child, we can delete it by index.
+        wordFormsRoot.getChildren().remove(wordFormsRoot.getChildren().size() - 1);
 
         // Now we create the new node and update it's child to contain our word-forms
         HBox savedFormsParent = FXMLLoader.load(getClass().getResource("savedFormsParent.fxml"));
+
         for (Node child : savedFormsParent.getChildren()) {
             if (child.getId().equals("savedForms")) {
                 ((Label) child).setText(forms);
@@ -204,18 +197,19 @@ public class Controller {
         // Now we go to the parent of the element "toBeDeleted" and remove the appropriate child...
         VBox wordFormsRoot = (VBox) savedFormsParent.getParent();
         wordFormsRoot.getChildren().remove(savedFormsParent);
-
     }
 
     public void editWordForms(ActionEvent event) {
-        String forms = "forms";
 
         Button editButton = (Button) event.getSource(); // source button
-        HBox savedFormsParent = (HBox) editButton.getParent();
-        forms = ((Label) savedFormsParent.getChildren().get(0)).getText(); // getting the forms
-        savedFormsParent.setId("toBeRemoved");
-        VBox wordFormsRoot = (VBox)(savedFormsParent.getParent());
+        HBox savedFormsParent = (HBox) editButton.getParent(); // source parent
 
+        String forms = ((Label) savedFormsParent.getChildren().get(0)).getText(); // getting the forms
+        savedFormsParent.setId("toBeRemoved"); // mark for deletion
+        VBox wordFormsRoot = (VBox)(savedFormsParent.getParent()); // parent of element to be deleted
+
+        // Now iterate through the parent's children until the element to be deleted is found.
+        // Use a counter, and then delete using the index.
         int indexCount = 0;
         for (Node child : wordFormsRoot.getChildren()) {
             if (child.getId().equals("toBeRemoved")) {
@@ -243,7 +237,8 @@ public class Controller {
             }
         }
         catch (IOException ioException) {
-            System.out.println("There was a problem loading \"newFormsParent.fxml\". ");
+            feedback.setTextFill(Color.rgb(255, 21, 0));
+            feedback.setText("There was a problem loading \"newFormsParent.fxml\". ");
         }
 
     }
@@ -265,27 +260,11 @@ public class Controller {
         contextPackMap.put("icon", iconPath);
         contextPackMap.put("enabled", isEnabled);
 
-        // Now we start to set the other values. Use event.getSource() to get the button where the event originated.
-        // Then, use getParent() to get element containing the button.
-        Object sourceButton = event.getSource();
-        Parent topAnchor = ((Button) sourceButton).getParent().getParent().getParent(); // Cast it to a button, so we can getParent().
-
-        // Names like 'topAnchor' are the actual fxID's of the objects they reference. This was done on purpose, so
-        // that we can follow along in the scenebuilder, to be sure we are selecting the correct objects.
-
-        // Here we get the name of the context pack.
-            for (Node child : infoHBox.getChildren() ) {
-                if (child.getId().equals("contextPackNameField")) {
-                    contextPackName = ((TextField) child).getText();
-                    System.out.println(contextPackName);
-                    break;
-                }
-            }
-
-
+        // Now we parse each word-pack...
         for (Node wordPackBox : wordPackRoot.getChildren()) {
             if (wordPackBox.getId().equals("wordPackBox")) {
-                parseWordPack(wordPackBox, contextPackMap); // See the function below this one...
+                parseWordPack(wordPackBox, contextPackMap);
+                // See the 'parseWordPack' function below this one...
                 // The wordPackBox contains everything in a word-pack. We pass the node and our
                 // context pack map into the function to add values.
             }
@@ -294,11 +273,15 @@ public class Controller {
         String jsonFromJavaMap = gsonBuilder.toJson(contextPackMap); //Used for debugging
         System.out.println(jsonFromJavaMap); // Used for debugging
 
+        // Now grab the context pack name to be used...
+        contextPackName = contextPackNameField.getText();
+
         // Now for the actual writing...
         try (Writer writer = new FileWriter(contextPackName + ".json")) {
             gsonBuilder.toJson(contextPackMap, writer);
+            feedback.setTextFill(Color.rgb(36, 186, 26));
+            feedback.setText("Successfully exported context-pack: " + contextPackName + "!");
         }
-
     }
 
     public void parseWordPack(Node wordPackBox, Map contextPackMap) {
@@ -388,13 +371,14 @@ public class Controller {
                             continue;
                         }
                         singleWordForms = new ArrayList<>();
+                       // Map singleWordMap = new HashMap<>();
 
                         String[] formsArray = ((Label) newFormsChild).getText().split(",[ ]*");
                         for (String form: formsArray) {
                             singleWordForms.add(form);
                         }
+
                         allWordsForms.add(singleWordForms);
-                        System.out.println("allWordsForms updated to " + allWordsForms);
                     }
                 }
             }
@@ -412,9 +396,7 @@ public class Controller {
     public void importJson(ActionEvent event)  throws IOException {
 
         ImportHelper importHelper = new ImportHelper();
-
         Gson gson = new Gson();
-
         Map contextPackMap = gson.fromJson(new FileReader(chooseJsonFile()), Map.class);
 
         // First thing, set the current icon path to what is retrieved from the JSON

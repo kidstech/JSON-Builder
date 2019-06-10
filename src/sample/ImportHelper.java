@@ -1,8 +1,10 @@
 package sample;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -13,6 +15,29 @@ public class ImportHelper {
 
     ImportHelper() {
         System.out.println("ImportHelper created");
+    }
+
+    public void addNewWordType(ActionEvent event) {
+        try {
+            Button sourceButton = (Button) event.getSource();
+            VBox wordTypeRoot = (VBox) sourceButton.getParent().getParent().getParent();
+            Parent newWordTypeBox = FXMLLoader.load(getClass().getResource("wordTypeBox.fxml"));
+            wordTypeRoot.getChildren().add(newWordTypeBox);
+        } catch (IOException ioException) {
+            System.out.println("addNewWordType failed");
+            System.out.println(ioException);
+        }
+    }
+
+    public void addNewWordPack(ActionEvent event, VBox wordPackRoot) {
+        try {
+            Parent newSubPack = FXMLLoader.load(getClass().getResource("wordPackBox.fxml"));
+            wordPackRoot.getChildren().add(newSubPack);
+        }
+        catch (IOException ioException) {
+            System.out.println("addNewWordPack failed");
+            System.out.println(ioException);
+        }
     }
 
     public void addChildWordPackBox(VBox wordPackRoot) {

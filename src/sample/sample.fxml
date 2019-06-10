@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.Label?>
 <AnchorPane fx:id="topParent" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
       <AnchorPane fx:id="topAnchor" layoutX="18.0" layoutY="14.0" prefHeight="76.0" prefWidth="735.0">
@@ -140,5 +141,6 @@
             </VBox>
          </content>
       </ScrollPane>
+      <Label fx:id="feedback" layoutX="26.0" layoutY="569.0" prefHeight="17.0" prefWidth="332.0" />
    </children>
 </AnchorPane>
